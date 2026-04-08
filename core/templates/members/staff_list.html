@@ -1,0 +1,49 @@
+{% extends "members/base.html" %}
+{% block title %}Staff — GymOS{% endblock %}
+{% block nav_staff %}active{% endblock %}
+{% block page_title %}Staff{% endblock %}
+{% block topbar_actions %}
+    <a href="{% url 'core:log_attendance' %}" class="btn btn-ghost btn-sm">✓ Log Attendance</a>
+    <a href="{% url 'core:add_staff' %}" class="btn btn-primary btn-sm">＋ Add Staff</a>
+{% endblock %}
+
+{% block content %}
+{% if staff %}
+<div class="card" style="padding:0; overflow:hidden;">
+<div class="table-wrap">
+<table>
+    <thead>
+        <tr><th>Name</th><th>Role</th><th>Phone</th><th>Joined</th><th>Status</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+    {% for s in staff %}
+    <tr>
+        <td>
+            <a href="{% url 'core:staff_detail' s.pk %}" style="color:var(--text); font-weight:600; text-decoration:none;">{{ s.name }}</a>
+        </td>
+        <td style="color:var(--muted);">{{ s.role }}</td>
+        <td style="color:var(--muted);">{{ s.phone }}</td>
+        <td style="color:var(--muted);">{{ s.date_joined|date:"d M Y" }}</td>
+        <td><span class="badge badge-{{ s.status|lower|slugify }}">{{ s.status }}</span></td>
+        <td>
+            <div class="td-actions">
+                <a href="{% url 'core:staff_detail' s.pk %}" class="btn btn-ghost btn-sm">View</a>
+                <a href="{% url 'core:edit_staff' s.pk %}" class="btn btn-ghost btn-sm">Edit</a>
+                <a href="{% url 'core:delete_staff' s.pk %}" class="btn btn-danger btn-sm">Delete</a>
+            </div>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+</div>
+{% else %}
+<div class="empty">
+    <div class="empty-icon">🏋️</div>
+    <p>No staff members yet.</p>
+    <br>
+    <a href="{% url 'core:add_staff' %}" class="btn btn-primary">＋ Add First Staff Member</a>
+</div>
+{% endif %}
+{% endblock %}

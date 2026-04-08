@@ -1,0 +1,112 @@
+{% extends "members/base.html" %}
+{% block title %}{{ member.name }} — GymOS{% endblock %}
+{% block nav_members %}active{% endblock %}
+{% block page_title %}Member Profile{% endblock %}
+{% block topbar_actions %}
+    <a href="{% url 'core:edit_member' member.pk %}" class="btn btn-ghost btn-sm">Edit</a>
+    <a href="{% url 'core:add_payment' member.pk %}" class="btn btn-primary btn-sm">＋ Record Payment</a>
+{% endblock %}
+
+{% block content %}
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px;">
+
+    <!-- Member info -->
+    <div class="card">
+        <div class="card-title">Member Info</div>
+        <div style="font-family:'Barlow Condensed',sans-serif; font-size:2rem; font-weight:800; margin-bottom:4px;">
+            {{ member.name }}
+        </div>
+        <div style="margin-bottom:16px;">
+            <span class="badge badge-{{ member.membership_type|lower }}">{{ member.membership_type }}</span>
+            <span class="badge badge-{{ member.status|lower }}" style="margin-left:6px;">{{ member.status }}</span>
+        </div>
+        <table style="font-size:0.9rem; width:100%;">
+            <tr><td style="color:var(--muted); padding:6px 0; width:120px;">Phone</td><td>{{ member.phone }}</td></tr>
+            <tr><td style="color:var(--muted); padding:6px 0;">Email</td><td>{{ member.email }}</td></tr>
+            <tr><td style="color:var(--muted); padding:6px 0;">Join Date</td><td>{{ member.join_date|date:"d M Y"|default:"—" }}</td></tr>
+            <tr><td style="color:var(--muted); padding:6px 0;">Expiry</td><td style="color:{% if member.is_expired %}var(--accent2){% else %}var(--text){% endif %};">{{ member.expiry_date|date:"d M Y"|default:"—" }}</td></tr>
+            <tr><td style="color:var(--muted); padding:6px 0;">Duration</td><td>{{ member.duration_months }} month{{ member.duration_months|pluralize }}</td></tr>
+        </table>
+    </div>
+
+    <!-- Plan utilisation -->
+    <div class="card">
+        <div class="card-title">Plan Utilisation</div>
+
+        <div style="font-family:'Barlow Condensed',sans-serif; font-size:3.5rem; font-weight:800; line-height:1; color:
+            {% if member.utilisation_percent >= 90 %}var(--accent2)
+            {% elif member.utilisation_percent >= 70 %}#ffc800
+            {% else %}var(--accent){% endif %};">
+            {{ member.utilisation_percent }}%
+        </div>
+        <div style="color:var(--muted); font-size:0.8rem; margin-bottom:16px;">of plan used</div>
+
+        <div class="progress-wrap" style="height:14px; margin-bottom:16px;">
+            <div class="progress-bar
+                {% if member.utilisation_percent >= 90 %}danger
+                {% elif member.utilisation_percent >= 70 %}warn
+                {% endif %}"
+                style="width:{{ member.utilisation_percent }}%;">
+            </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; text-align:center;">
+            <div style="background:var(--surface2); border-radius:var(--radius); padding:12px;">
+                <div style="font-family:'Barlow Condensed',sans-serif; font-size:1.8rem; font-weight:700; color:var(--accent);">
+                    {{ member.days_used }}
+                </div>
+                <div style="font-size:0.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em;">Days Used</div>
+            </div>
+            <div style="background:var(--surface2); border-radius:var(--radius); padding:12px;">
+                <div style="font-family:'Barlow Condensed',sans-serif; font-size:1.8rem; font-weight:700; color:
+                    {% if member.days_remaining == 0 %}var(--accent2)
+                    {% elif member.days_remaining <= 7 %}#ffc800
+                    {% else %}var(--success){% endif %};">
+                    {{ member.days_remaining }}
+                </div>
+                <div style="font-size:0.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em;">Days Left</div>
+            </div>
+        </div>
+
+        <div style="margin-top:12px; font-size:0.8rem; color:var(--muted); text-align:center;">
+            {{ member.total_plan_days }} total days in plan
+        </div>
+    </div>
+</div>
+
+<!-- Payment history -->
+<div class="card">
+    <div class="card-title" style="display:flex; justify-content:space-between; align-items:center;">
+        <span>Payment History</span>
+        <a href="{% url 'core:add_payment' member.pk %}" class="btn btn-primary btn-sm">＋ Record Payment</a>
+    </div>
+    {% if payments %}
+    <div class="table-wrap">
+    <table>
+        <thead>
+            <tr><th>Date</th><th>Amount</th><th>Method</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+        {% for p in payments %}
+        <tr>
+            <td style="color:var(--muted);">{{ p.payment_date|date:"d M Y" }}</td>
+            <td style="font-family:'Barlow Condensed',sans-serif; font-size:1.1rem; font-weight:700; color:var(--success);">KES {{ p.amount|floatformat:0 }}</td>
+            <td><span class="badge badge-basic">{{ p.payment_method }}</span></td>
+            <td style="color:var(--muted);">{{ p.notes|default:"—" }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% else %}
+    <div class="empty"><div class="empty-icon">💳</div><p>No payments recorded yet.</p></div>
+    {% endif %}
+</div>
+
+<div style="margin-top:8px;">
+    <a href="{% url 'core:member_list' %}" class="btn btn-ghost btn-sm">← Back to Members</a>
+    <a href="{% url 'core:delete_member' member.pk %}" class="btn btn-danger btn-sm" style="margin-left:8px;">Delete Member</a>
+</div>
+
+{% endblock %}

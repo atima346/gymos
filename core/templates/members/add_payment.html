@@ -1,0 +1,29 @@
+{% extends "members/base.html" %}
+{% block title %}Record Payment — GymOS{% endblock %}
+{% block nav_members %}active{% endblock %}
+{% block page_title %}Record Payment{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:520px;">
+    <div style="margin-bottom:20px;">
+        <div style="font-size:0.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em;">Recording payment for</div>
+        <div style="font-family:'Barlow Condensed',sans-serif; font-size:1.6rem; font-weight:700;">{{ member.name }}</div>
+    </div>
+    <form method="POST" novalidate>
+        {% csrf_token %}
+        <div class="form-grid">
+            {% for field in form %}
+            <div class="form-group {% if field.name == 'notes' %}full{% endif %}">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {{ field.errors }}
+            </div>
+            {% endfor %}
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save Payment</button>
+            <a href="{% url 'core:member_detail' member.pk %}" class="btn btn-ghost">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

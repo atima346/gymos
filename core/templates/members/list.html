@@ -1,0 +1,81 @@
+{% extends "members/base.html" %}
+{% block title %}Members — GymOS{% endblock %}
+{% block nav_members %}active{% endblock %}
+{% block page_title %}Members{% endblock %}
+{% block topbar_actions %}
+    <a href="{% url 'core:update_statuses' %}" class="btn btn-ghost btn-sm">↻ Sync Statuses</a>
+    <a href="{% url 'core:add_member' %}" class="btn btn-primary btn-sm">＋ Add Member</a>
+{% endblock %}
+
+{% block content %}
+
+<form method="GET" class="search-row">
+    {{ search_form.q }}
+    <button type="submit" class="btn btn-primary btn-sm">Search</button>
+    {% if request.GET.q %}
+        <a href="{% url 'core:member_list' %}" class="btn btn-ghost btn-sm">✕ Clear</a>
+    {% endif %}
+</form>
+
+{% if members %}
+<div class="card" style="padding:0; overflow:hidden;">
+<div class="table-wrap">
+<table>
+    <thead>
+        <tr>
+            <th>Name</th><th>Phone</th><th>Type</th>
+            <th>Join Date</th><th>Expiry</th><th>Status</th><th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for m in members %}
+    <tr>
+        <td>
+            <a href="{% url 'core:member_detail' m.pk %}" style="color:var(--text); font-weight:600; text-decoration:none;">
+                {{ m.name }}
+            </a>
+        </td>
+        <td style="color:var(--muted);">{{ m.phone }}</td>
+        <td><span class="badge badge-{{ m.membership_type|lower }}">{{ m.membership_type }}</span></td>
+        <td style="color:var(--muted);">{{ m.join_date|date:"d M Y"|default:"—" }}</td>
+        <td style="color:{% if m.is_expired %}var(--accent2){% else %}var(--muted){% endif %};">
+            {{ m.expiry_date|date:"d M Y"|default:"—" }}
+        </td>
+        <td><span class="badge badge-{{ m.status|lower }}">{{ m.status }}</span></td>
+        <td>
+            <div class="td-actions">
+                <a href="{% url 'core:member_detail' m.pk %}" class="btn btn-ghost btn-sm">View</a>
+                <a href="{% url 'core:edit_member' m.pk %}" class="btn btn-ghost btn-sm">Edit</a>
+                <a href="{% url 'core:add_payment' m.pk %}" class="btn btn-primary btn-sm">＋ Pay</a>
+                <a href="{% url 'core:delete_member' m.pk %}" class="btn btn-danger btn-sm">Delete</a>
+            </div>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+</div>
+
+{% if members.has_other_pages %}
+<div style="display:flex; gap:8px; align-items:center; margin-top:16px;">
+    {% if members.has_previous %}
+        <a href="?page={{ members.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="btn btn-ghost btn-sm">← Prev</a>
+    {% endif %}
+    <span style="font-size:0.85rem; color:var(--muted);">Page {{ members.number }} of {{ members.paginator.num_pages }}</span>
+    {% if members.has_next %}
+        <a href="?page={{ members.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="btn btn-ghost btn-sm">Next →</a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% else %}
+<div class="empty">
+    <div class="empty-icon">👥</div>
+    <p>No members found{% if request.GET.q %} for "<strong>{{ request.GET.q }}</strong>"{% endif %}.</p>
+    <br>
+    <a href="{% url 'core:add_member' %}" class="btn btn-primary">＋ Add First Member</a>
+</div>
+{% endif %}
+
+{% endblock %}

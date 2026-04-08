@@ -1,0 +1,20 @@
+{% extends "members/base.html" %}
+{% block title %}Delete Staff — GymOS{% endblock %}
+{% block nav_staff %}active{% endblock %}
+{% block page_title %}Delete Staff Member{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:480px; border-color:var(--accent2);">
+    <div style="font-size:2rem; margin-bottom:12px;">⚠️</div>
+    <h2 style="font-family:'Barlow Condensed',sans-serif; font-size:1.4rem; margin-bottom:8px;">Are you sure?</h2>
+    <p style="color:var(--muted); margin-bottom:6px;">You are about to permanently delete <strong style="color:var(--text);">{{ staff.name }}</strong>.</p>
+    <p style="color:var(--muted); font-size:0.85rem; margin-bottom:24px;">This will also delete all their shifts and attendance records. This cannot be undone.</p>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-actions">
+            <button type="submit" class="btn btn-danger">Yes, Delete</button>
+            <a href="{% url 'core:staff_list' %}" class="btn btn-ghost">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
